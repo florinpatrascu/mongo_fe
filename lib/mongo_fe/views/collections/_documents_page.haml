@@ -1,0 +1,82 @@
+- unless @documents.nil? || @documents.count == 0
+  %table.table-striped
+    %thead
+      %tr.well.well-small
+        %th(width="10%") _id
+        %th(width="2%") &nbsp
+        %th(width="80%" align="left") document attributes
+        %th(width="5%" align="right")
+    %tbody
+      - @documents.each do |doc|
+        -doc_id=doc.delete('_id')
+        %tr
+          %td.muted(valign="top") #{doc_id}
+          %td(valign="top")
+            %i.icon-arrow-right
+          -json_attributes = doc.to_json 
+          %td(valign="top") #{json_attributes}
+          %td(valign="top" nowrap)
+            %a#edit-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#document-update-dialog" data-doc="#{json_attributes}")
+              %i.icon-pencil
+            %a#confirm-delete-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#confirm-delete-document-dialog")
+              %i.icon-remove
+
+- else
+  %h4 this collection is empty.
+%br
+%a.btn.btn-primary.btn-small(href="#new-document-modal" data-toggle="modal") add new document
+
+
+#new-document-modal.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 New document
+  .modal-body
+    %form.form-horizontal{:method => "post", :action => "/databases/#{db.name}/collections/#{collection.name}/documents#collections-documents-tab"}
+      %fieldset
+        =partial '/collections/document_attributes', :locals => {:db=>db, :collection=>collection}
+        .form-actions.modal-footer
+          %a.btn(href="#" data-dismiss="modal") Close
+          -# data-dismiss="modal"
+          %button#new-document-modal-submit-button.btn.btn-primary.closeModal(type="submit") Save
+
+#document-update-dialog.modal.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 Update document
+    %p.well.well-small
+      %strong id: 
+      %span.lead.doc-id.muted
+    
+  .modal-body
+    %form.form-horizontal{:method => "post", :action => "/databases/#{db.name}/collections/#{collection.name}/documents"}
+      %input{:type => "hidden", :name => "_method", :value => "put"}
+      %input.doc-id-field{:type => "hidden", :name => "doc_id", :value => ""}
+      %fieldset
+        =partial '/collections/document_attributes', :locals => {:db=>db, :collection=>collection}
+        .form-actions.modal-footer
+          %a.btn(href="#" data-dismiss="modal") Close
+          -# data-dismiss="modal"
+          %button#new-document-modal-submit-button.btn.btn-primary.closeModal(type="submit") Save changes
+
+
+#confirm-delete-document-dialog.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 Delete document
+  .modal-body
+    %p.lead
+      You are about to delete one document. This procedure is irreversible.
+    %p.well.well-small
+      doc id: 
+      %span.lead.doc-id.muted
+    %form.form-horizontal{:method => "post", :action => "/databases/#{db.name}/collections/#{collection.name}/documents"}
+      %input{:type => "hidden", :name => "_method", :value => "delete"}
+      %input.doc-id-field{:type => "hidden", :name => "doc_id", :value => ""}
+      %fieldset
+        .form-actions.modal-footer
+          %a.btn(href="#" data-dismiss="modal") Close
+          %button#new-document-modal-submit-button.btn.btn-danger.closeModal(type="submit") Delete

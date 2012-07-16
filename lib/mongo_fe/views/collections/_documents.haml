@@ -1,0 +1,35 @@
+/ .span10
+/   query, list and edit documents in: #{db.name}.#{collection.name}
+/ request.path_info
+%div
+  %form(method="post" action="/databases/#{db.name}/collections/#{collection.name}/search")
+    %fieldset.well.well-small
+      %table
+        %tr
+          %td(valign="top" width="65%")
+            %label.control-label(for="json-query") 
+              %h3 Query
+            %textarea#json-query.input-xlarge.field.span11(rows="5" placeholder="#{PLACEHOLDER_QUERY_STRING}" name="json_query")
+              =query.string if session[:query]
+            .help-inline.muted other query examples: {"loc": {"$near": [50, 50]}}
+          %td(valign="top" width="35%" align="right")
+            %span.label.label-info
+              query options
+            %label.control-label.muted(for="json-query-show") Show only these fields
+            %input.input-xlarge#json-query-show(placeholder="#{PLACEHOLDER_SHOW}" name="json_query_show" value="#{query.show if session[:query]}")
+            %label.control-label.muted(for="json-query-sort") Sort by
+            %input.input-xlarge#json-query-sort(placeholder="#{PLACEHOLDER_SORT}" name="json_query_sort" value="#{query.sort if session[:query]}")
+        %tr
+          %td(colspan=2 nowrap align="right" width="15%")
+            %button.btn.btn-medium.btn-warning(type="submit" name="reset_query" value="true") Reset Query
+            &nbsp
+            %button.btn.btn-medium.btn-success(type="submit") Run Query
+  
+  .span2
+    %button.btn.btn-primary.disabled.btn-medium Documents
+  .digg_pagination
+    =will_paginate @documents, :container => false,
+      :renderer=> WillPaginate::Sinatra::LinkRenderer #, :renderer => BootstrapPagination::Sinatra
+  %br
+  = partial '/collections/documents_page', :locals=>{ :db=>db, :collection=>collection, :documents=>@documents}
+

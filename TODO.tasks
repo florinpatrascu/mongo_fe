@@ -1,0 +1,9 @@
+The following describes and discusses a set of functions to be added in the next releases
+ 
+  - improve the connection implementation
+  - enable the Javascript JSON editor; it is loaded but dormant right now
+  - add support for importing/exporting documents
+  - add support for geospatial indexes
+  - finalize and deploy the 'Collection::Tools' TAB, a set of useful MongoDB commands such as: find/replace/reindex/etc.
+  - add support for saving and restoring user preferences, including query objects
+  ✓ make this list ;)

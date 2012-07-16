@@ -1,0 +1,80 @@
+%button.btn.btn-medium.btn-primary.disabled 
+  db: #{@db.name}
+
+.row
+  .span5.well.well-small 
+    %h3 Info
+    %pre
+      =pretty_json(@db.stats)
+    .pull-right
+      Delete this database?
+      %button.btn.btn-medium.btn-danger( data-toggle="modal" data-target="#confirm-db-deletion")
+        DELETE
+  .span4
+    -# http://learnmongo.com/posts/quick-tip-mongodb-users/
+    = partial :'databases/list_users', :locals => {:users=>@db.users, :db_name => @db.name}
+    %button#add-user.btn.btn-small.btn-info( data-toggle="modal" data-target="#user-dialog")
+      Add a user
+.row
+
+#user-dialog.modal.fit-content( style="display:none;")
+  %button.close( data-dismiss='modal') x
+  .modal-header
+    %h2#title Add user 
+  .modal-body
+    %form.form-horizontal{:method => "post", :action => "/databases/#{@db.name}/users"}
+      %input{:type => "hidden", :name => "_method", :value => "post"}
+      %fieldset
+        .control-group
+          %label.control-label( for="input-name") Name:
+          .controls
+            %input#input-name.input-xlarge( type="text" name="username" style="height: 28px;")
+            %p.help-block please enter the user name
+        .control-group
+          %label.control-label( for="input-password") Password:
+          .controls
+            %input#input-password.input-xlarge( type="password" name="password" style="height: 28px;")
+            %p.help-block please enter the user password
+        .control-group
+          %label.control-label( for='is-read-only')
+          .controls
+            %label.checkbox.inline
+              %input#is-read-only{ :type=>'checkbox', :name=>'readonly'} Read-only?
+        .form-actions.modal-footer
+          %button.btn.btn-medium.btn-danger( data-dismiss = 'modal') 
+            CANCEL
+          %button#btn-create.btn.btn-medium.btn-primary.closeModal( type="submit")
+            SAVE USER
+
+#confirm-db-deletion.modal.fit-content( style="display:none;")
+  %button.close( data-dismiss='modal') x
+  .modal-header
+    %h2 Delete '#{@db.name}'? 
+  .modal-body
+    %p This cannot be undone.
+  .modal-footer
+    %form{:method => "post", :action => "/databases/#{@db.name}"}
+      %input{:type => "hidden", :name => "_method", :value => "delete"}
+      #cancel.btn.btn-medium.btn-success.span3( data-dismiss = 'modal') 
+        CANCEL
+      %button.btn.btn-medium.btn-danger.span2.closeModal( type="submit")
+        DELETE
+
+#confirm-delete-user.modal.fit-content(style="display:none;")
+  .modal-header
+    %h1#delete-dialog-title Delete user
+  .modal-body
+    #user-name
+    %p
+      %h5
+        Warning, this operation cannot be undone! Are you sure you want to delete this user?
+  .modal-footer
+    %form.primary{:method => "post", :action => ""}
+      %input{:type => "hidden", :name => "_method", :value => "delete"}
+      %input.username{:type => "hidden", :name => "username", :value => ""}
+      %button.btn.btn-medium.btn-danger.span2.closeModal( type="submit")
+        DELETE
+      #cancel.btn.btn-medium.btn-success.span3( data-dismiss = 'modal') 
+        CANCEL
+    
+%script{ :type => "text/javascript", :src =>"/js/db-tools.js"}

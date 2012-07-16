@@ -1,0 +1,80 @@
+-unless @collection.nil?
+  %ul.nav.nav-tabs
+    %li.inactive
+      %button.btn.btn-medium.btn-primary.disabled 
+        -# we know: #{current_db.name}.#{@collection.name}
+        collection: #{@collection.name}
+      .span1
+    
+    %li
+      %a#collections-info(href="#collections-info-tab" data-toggle="tab") Info
+    %li
+      %a#collections-documents(href="#collections-documents-tab" data-toggle="tab") Documents
+    %li
+      %a#collections-indexes(href="#collections-indexes-tab" data-toggle="tab") Indexes
+      
+  #collections-tab-contents.tab-content
+    .tab-pane.fade#collections-info-tab
+      %span5.well 
+        %pre
+          =pretty_json(@collection.stats)
+        .pull-right
+          .span4
+            %button#rename-collection-button.btn.btn-medium.btn-info( data-toggle="modal" data-target="#rename-collection-dialog" data-collection-name="#{h @collection.name}" data-db-name="#{h current_db.name}")
+              RENAME
+          .span1
+          .span4
+            %button#delete-collection-button.btn.btn-medium.btn-danger( data-toggle="modal" data-target="#confirm-collection-deletion" data-collection-name="#{h @collection.name}" data-db-name="#{h current_db.name}")
+              DELETE
+    .tab-pane.fade#collections-documents-tab
+      =partial 'collections/documents', :locals=>{:db=>current_db, :collection=>@collection}
+    .tab-pane.fade#collections-indexes-tab
+      =partial 'collections/indexes', :locals=>{:db=>current_db, :collection=>@collection}
+    
+  .row
+- else
+  Unknown collection: #{params[:name]}
+
+#rename-collection-dialog.modal(style="display:none;")
+  .modal-header
+    %a.close( href='#' data-dismiss='modal') &times;
+    %h3
+      Rename:
+      %span.old_collection_name
+  .modal-body
+    %form.primary.form-horizontal{:method => "post", :action => "#"}
+      %input#verb-type{:type => "hidden", :name => "_method", :value => "put"}
+      %fieldset
+        .control-group
+          %label.control-label( for="input-name") New name:
+          .controls
+            %input.collection-name.input-xlarge( type="text" name="collection_new_name" style="height: 28px;")
+            %p.help-block please enter the new name of this collection.
+        .form-actions.modal-footer
+          %button#btn-create.btn.btn-medium.btn-danger.closeModal( type="submit")
+            RENAME
+          %button.btn.btn-medium.btn-success( data-dismiss = 'modal') 
+            CANCEL
+  
+#confirm-collection-deletion.modal.fit-content( style="display:none;")
+  %button.close( data-dismiss='modal') x
+  .modal-header
+    %h2.no-wrap 
+      Delete: 
+      %span#delete-collection-dialog-title
+      ?
+  .modal-body
+    %p 
+      %h3
+        You will delete all the documents in this collection.
+        This cannot be undone.
+  .modal-footer
+    %form.primary{:method => "post", :action => "#"}
+      %input{:type => "hidden", :name => "_method", :value => "delete"}
+      %input.collection-name{:type => "hidden", :name => "collection_name", :value => ""}
+      %button.btn.btn-medium.btn-danger.span2.closeModal( type="submit")
+        DELETE
+      #cancel.btn.btn-medium.btn-success.span3( data-dismiss = 'modal') 
+        CANCEL
+
+%script{ :type => "text/javascript", :src =>"/js/collection-tools.js"}  

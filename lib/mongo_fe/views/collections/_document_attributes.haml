@@ -1,0 +1,6 @@
+-#=collection.name
+.control-group
+  %label.control-label.pull-left(for="json-doc-attributes") Attributes:
+  .controls
+    %textarea#json-doc-attributes.input-xlarge.field.span10(name="json_doc_attributes" rows="6" placeholder='ex. {"random_thoughts":"#{random_string(10)}"}')
+    %p#json-doc-attributes-msg.help-block please enter a valid JSON structure.

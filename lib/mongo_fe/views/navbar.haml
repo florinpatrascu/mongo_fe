@@ -1,0 +1,17 @@
+.navbar.navbar-fixed-top
+  .navbar-inner
+    .container-fluid
+      %a.btn.btn-navbar{ "data-toggle".to_sym => "collapse", "data-target".to_sym => ".nav-collapse"}
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.brand{:href => '/'} MongoFE
+      .nav-collapse
+        %p.navbar-text.pull-right
+          -if current_db?
+            =current_db.name
+            - if collection?
+              |
+              =collection.name
+          -else 
+            database|collection

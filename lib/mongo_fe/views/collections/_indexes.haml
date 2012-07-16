@@ -1,0 +1,76 @@
+%p
+  - unless @indexes.nil?
+    %table.table-striped
+      %thead
+        %tr.well
+          %th(width="20%") NAME
+          %th(width="48%" align="left") INDEXED FIELD(S)
+          %th(width="7%"  align="center") UNIQUE
+          %th(width="9%"  align="center") SPARSE
+          %th(width="10%" align="right") SIZE (MB)
+          %th(width="9%" nowrap)
+      %tbody
+        - @indexes.each_pair do |k,v|
+          %tr
+            %td(valign="top" align="left")
+              =k
+            %td(valign="top" align="left")
+              =v['key']
+            %td(valign="top" align="center")
+              =v['unique'] ? '✓': '-'  
+            %td(valign="top" align="center")
+              =v['sparse'] ? '✓': '-'  
+            %td(valign="top" align="right")
+              ='%.3f' % bytes_to_mb(collection.stats['indexSizes'][k])
+            %td(valign="top" nowrap align="right")
+              - unless k.eql? '_id_'
+                %a#confirm-delete-index-button(href="#" data-index-name="#{k}" data-toggle="modal" data-target="#confirm-delete-index-dialog")
+                  %i.icon-remove
+  - else
+    no indexes defined.
+%p  
+  %a.btn.btn-primary.btn-small#new-index-button(href="#new-index-dialog" data-toggle="modal") new index
+
+
+#new-index-dialog.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 Create a new index
+  .modal-body
+    %form.form-horizontal{:method => "post", :action => "/databases/#{db.name}/collections/#{collection.name}/indexes"}
+      %fieldset
+        .control-group
+          %label.control-label( for='index-fields') Indexed fields
+          .controls
+            %textarea#index-fields.input-xlarge.field.span10(name="index_fields" rows="5" placeholder='ex. name:ASC, created_at:DESC')
+            %p#index_fields-msg.help-block 
+        .control-group
+          %label.control-label       
+          .controls
+            %label.checkbox.inline
+              %input#is-unique{ :type=>'checkbox', :name=>'unique', :value => false} unique?
+            %label.checkbox.inline
+              %input#is-sparse{ :type=>'checkbox', :name=>'sparse', :value => false} sparse?
+        .form-actions.modal-footer
+          %a.btn(href="#" data-dismiss="modal") Close
+          %button#new-index-dialog-submit-button.btn.btn-primary.closeModal(type="submit") Create
+          
+#confirm-delete-index-dialog.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 Delete index
+  .modal-body
+    %p.lead
+      You are about to delete a collection index. This procedure is irreversible.
+    %p.well.well-small
+      delete: 
+      %span.lead.index-name.muted
+    %form.form-horizontal{:method => "post", :action => "/databases/#{db.name}/collections/#{collection.name}/indexes"}
+      %input{:type => "hidden", :name => "_method", :value => "delete"}
+      %input.index-name-field{:type => "hidden", :name => "index_name", :value => ""}
+      %fieldset
+        .form-actions.modal-footer
+          %a.btn(href="#" data-dismiss="modal") Close
+          %button#new-document-modal-submit-button.btn.btn-danger.closeModal(type="submit") Delete

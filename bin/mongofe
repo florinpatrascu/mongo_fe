@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
+
+require "hashie/mash"
+require 'cgi'
+require "yaml"
+require 'sinatra/base'
+require 'sinatra/contrib'
+require 'mongo'
+require 'mongo_fe'
+require 'vegas'
+require "uri"
+
+require "mongo_fe/application_controller"
+require "mongo_fe/controllers/databases_controller"
+require "mongo_fe/controllers/collections_controller"
+require "mongo_fe/helpers/helpers"
+
+begin
+  config = Hashie::Mash.new (YAML.load(File.new(File.expand_path('~/.mongo_fe')))) || 'mongodb://localhost:27017'
+  MongoFe::MongoDB.uri = config.uri
+rescue
+  $stderr.puts "You must create a file in your home directory called .mongo_fe; error: #{$!.message}"
+  exit 1
+end
+
+app = Rack::Builder.new do
+  # Dir.glob('../lib/{mongo_fe,mongo_fe/helpers,mongo_fe/controllers}/*.rb').each { |file| require file }
+
+  begin
+    use MongoFe::ApplicationController
+    use MongoFe::DatabasesController
+    use MongoFe::CollectionsController
+  
+    run Sinatra::Base
+  rescue => e
+    $stderr.puts "Cannot load the app; error: #{$!.message}"
+    exit 1    
+  end
+  
+end
+
+Vegas::Runner.new( app, 'mongofe', {
+    :before_run => lambda { |v|
+      path = (ENV['MONGO_FE_CONFIG'] || v.args.first)
+      load path.to_s.strip if path
+    }
+}) do |runner, opts, app|
+
+  opts.on('-C uri', "--connect uri", "set the MongodDB connection string") { |uri|
+    MongoFe::MongoDB.uri = uri
+  }
+end

@@ -1,0 +1,148 @@
+!!!
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %title MongoFE - A MongoDB simple administrative front-end
+    %meta{:name => "description", :content => "A very simple yet versatile MongoDB administrative user interface"}
+    %meta{:name => "author", :content => "Florin T.PATRASCU"}
+    :plain
+      <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+      <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <![endif]-->
+
+    / Le styles
+    %link{ :href => "/bootstrap/css/bootstrap.css", :type => "text/css", :rel => "stylesheet" }
+    / add body padding styles
+    %link{ :href => "/css/styles.css", :type => "text/css", :rel => "stylesheet" }
+    %link{ :href => "/css/digg_pagination.css", :type => "text/css", :rel => "stylesheet" }
+
+    -# JSON Editor, the CSS
+    %link{ :href => "/css/jsoneditor.css", :type => "text/css", :rel => "stylesheet" }
+    %link{ :href => "/bootstrap/css/bootstrap-responsive.css", :type => "text/css", :rel => "stylesheet" }  
+
+    / Le fav and touch icons 
+    %link{ rel: "apple-touch-icon", href: "/bootstrap/images/apple-touch-icon.png"}
+    %link{ rel: "shortcut icon", href: "/bootstrap/images/favicon.ico"}
+    %link{ rel: "apple-touch-icon", sizes: "72x72", href: "/bootstrap/images/apple-touch-icon-72x72.png"}
+    %link{ rel: "apple-touch-icon", sizes: "114x114", href: "/bootstrap/images/apple-touch-icon-114x114.png"}
+
+    %script{ :type => "text/javascript", :src =>"/js/jsoneditor/json2.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/jquery.js"}
+    %script{ :type => "text/javascript", :src =>"/js/jsoneditor/jquery.jsoneditor.min.js"}
+    
+  
+  %body
+    
+    %div= haml :navbar
+    %div
+      .container-fluid
+        .row-fluid
+          .span3
+            .well.sidebar-nav
+              %ul.nav-list.nav
+                %li.nav-header
+                  %span
+                    Databases
+                    %a#new-db(href="#" data-toggle="modal" data-target="#new-db-dialog")
+                      %i.icon-plus-sign
+                  - dbs = MongoFe::MongoDB.available_databases
+                  - unless dbs.nil?
+                    - dbs.each do |d|
+                      %li
+                        %a{:href => "/databases/#{h d}"}
+                          -if current_db? && d == current_db.name
+                            %i.icon-ok-circle
+                          -else
+                            %i.icon-minus.icon-white
+                          #{d}
+                -if current_db?
+                  %li.nav-header
+                    %span
+                      Collections
+                      -if current_db?
+                        %a#add-collection( data-target="#new-collection-dialog" href="#" data-toggle="modal" data-db-name="#{h current_db.name}")
+                          %i.icon-plus-sign
+                    - collections = current_db.collection_names - %w[system.users system.indexes]
+                    - unless collections.nil?
+                      - collections.each do |c|
+                        %li
+                          %a{:href => "/databases/#{h current_db.name}/collections/#{h c}"}
+                            -if !collection.nil? && c == collection.name
+                              %i.icon-ok-circle
+                            -else
+                              %i.icon-minus.icon-white
+                            #{c}
+                    - else
+                      %li empty
+          .span9
+            - flash.each do |name, msg|
+              .alert.fade.in{:class => "alert alert-#{name}", "data-alert" => "alert"}
+                %a.close{"data-dismiss" => "alert", :href => "#"}
+                  %i.icon-remove
+                %p=msg
+            - flash.clear if flash.count > 0
+
+          .span9
+            = yield
+        %br    
+        %hr
+        %h6= haml :footer
+
+        -# FIXME: the next two dialogs can be one
+        #new-db-dialog.modal(style="display:none;")
+          .modal-header
+            %a.close( href='#' data-dismiss='modal') &times;
+            %h2#dialog-title New database
+          .modal-body
+            %form.form-horizontal{:method => "post", :action => "/databases"}
+              %input#verb-type{:type => "hidden", :name => "_method", :value => "post"}
+              %fieldset
+                .control-group
+                  %label.control-label( for="input-name") Name:
+                  .controls
+                    %input#input-name.input-xlarge( type="text" name="name" style="height: 28px;")
+                    %p.help-block please enter the name of the database.
+                .form-actions.modal-footer
+                  %button#btn-create.btn.btn-medium.btn-primary.closeModal( type="submit")
+                    CREATE
+                  %button.btn.btn-medium.btn-danger( data-dismiss = 'modal') 
+                    CANCEL
+
+        #new-collection-dialog.modal(style="display:none;")
+          .modal-header
+            %a.close( href='#' data-dismiss='modal') &times;
+            %h2#dialog-title New collection
+          .modal-body
+            %form.primary.form-horizontal{:method => "post", :action => "#"}
+              %input#verb-type{:type => "hidden", :name => "_method", :value => "post"}
+              %fieldset
+                .control-group
+                  %label.control-label( for="input-name") Name:
+                  .controls
+                    %input.collection-name.input-xlarge( type="text" name="collection_name" style="height: 28px;")
+                    %p.help-block please enter the name of the collection.
+                .form-actions.modal-footer
+                  %button#btn-create.btn.btn-medium.btn-primary.closeModal( type="submit")
+                    CREATE
+                  %button.btn.btn-medium.btn-danger( data-dismiss = 'modal') 
+                    CANCEL
+
+    / Placed at the end of the document so the pages load faster
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-transition.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-alert.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-modal.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-dropdown.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-scrollspy.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-tab.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-tooltip.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-popover.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-button.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-collapse.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-carousel.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/basic/bootstrap-typeahead.js"}
+    %script{ :type => "text/javascript", :src =>"/bootstrap/js/underscore-min.js"}
+    
+    %script{ :type => "text/javascript", :src =>"/app/application.js"}
+    %script{ :type => "text/javascript", :src =>"/js/db-tools.js"}
+    
