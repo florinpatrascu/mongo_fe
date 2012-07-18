@@ -81,6 +81,7 @@ describe "Collections Controller" do
   describe "POST /databases/:db_name/collections/:collection_name/documents" do
     it "should insert a new document" do
       post "/databases/#{db_name}/collections/#{collection_name}/documents", {:json_doc_attributes => test_doc_json}
+      follow_redirect!
       last_response.body.should contain("added to: #{db_name}.#{collection_name}")
       # todo verify the Document insertion
     end
@@ -112,7 +113,7 @@ describe "Collections Controller" do
 
       follow_redirect!
       # "The index: '#{index_name}' was successfully created"
-      index.name = last_response.body[/index: '([^']+)/,1]
+      index.name = last_response.body[/index: '([^']+)/, 1]
       last_response.body.should contain("was successfully created")
     end
   end
@@ -134,7 +135,7 @@ describe "Collections Controller" do
       last_response.body.should contain("The index: '#{index.name}', was deleted successfully.")
 
       indexes = collection.index_information
-      indexes.should_not contain(index.name)      
+      indexes.should_not contain(index.name)
     end
   end
 

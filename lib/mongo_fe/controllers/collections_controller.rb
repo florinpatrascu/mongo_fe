@@ -201,23 +201,7 @@ module MongoFe
 
         end
 
-        unless @collection.nil?
-          @page = params[:page].to_i || 1
-          @query= session[:query]
-
-          begin
-            @total, @documents = MongoFe::MongoDB::SearchDocuments.new(current_db, @collection).list(@query, @page, 10)
-            flash_search_results @query, @total
-          rescue => e
-            session[:query] = nil
-            @total, @documents = MongoFe::MongoDB::SearchDocuments.new(current_db, @collection).list(nil, 1, 10)
-
-            flash[:error] = "Resetting to find all. Cause: #{e.message}"
-          end
-
-        end
-
-        haml :'/collections/index'
+        redirect "/databases/#{current_db.name}/collections/#{@collection.name}"
       end
 
       put "/:collection_name/?" do

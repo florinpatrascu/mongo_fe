@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "bson"
   gem.add_runtime_dependency "bson_ext"
   gem.add_runtime_dependency "json"
-  gem.add_runtime_dependency 'will_paginate', '>= 3.0.0'
+  gem.add_runtime_dependency 'agnostic-will_paginate', '>= 3.0.0'
   gem.add_runtime_dependency 'will_paginate-bootstrap'
   gem.add_runtime_dependency "sinatra", "~> 1.3.2"
   gem.add_runtime_dependency "sinatra-contrib", "~> 1.3.1"
