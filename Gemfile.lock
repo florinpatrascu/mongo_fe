@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mongo_fe (0.1.1)
+    mongo_fe (0.1.2)
       agnostic-will_paginate (>= 3.0.0)
       bson
       bson_ext
@@ -30,7 +30,7 @@ GEM
     appraisal (0.4.1)
       bundler
       rake
-    backports (2.6.1)
+    backports (2.6.2)
     bson (1.6.4)
     bson_ext (1.6.4)
       bson (~> 1.6.4)
