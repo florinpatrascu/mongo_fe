@@ -14,9 +14,11 @@
           %td(valign="top")
             %i.icon-arrow-right
           -json_attributes = doc.to_json 
-          %td(valign="top") #{json_attributes}
+          %td(valign="top" id="#{doc_id}") #{json_attributes}
           %td(valign="top" nowrap)
-            %a#edit-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#document-update-dialog" data-doc="#{json_attributes}")
+            %a#preview-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#document-preview-dialog")
+              %i.icon-indent-left
+            %a#edit-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#document-update-dialog")
               %i.icon-pencil
             %a#confirm-delete-document(href="#" data-id="#{doc_id}" data-toggle="modal" data-target="#confirm-delete-document-dialog")
               %i.icon-remove
@@ -26,6 +28,16 @@
 %br
 %a.btn.btn-primary.btn-small(href="#new-document-modal" data-toggle="modal") add new document
 
+
+#document-preview-dialog.modal.hide
+  .modal-header
+    %a.close(data-dismiss="modal")
+      %icon.icon-remove
+    %h3 Preview document
+  .modal-body
+    %pre.prettyprint.linenums.document-body
+  .modal-footer
+    %a.btn(href="#" data-dismiss="modal") Close
 
 #new-document-modal.modal.hide
   .modal-header
@@ -41,7 +53,7 @@
           -# data-dismiss="modal"
           %button#new-document-modal-submit-button.btn.btn-primary.closeModal(type="submit") Save
 
-#document-update-dialog.modal.modal.hide
+#document-update-dialog.modal.hide
   .modal-header
     %a.close(data-dismiss="modal")
       %icon.icon-remove
