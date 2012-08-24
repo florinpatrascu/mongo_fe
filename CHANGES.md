@@ -1,3 +1,10 @@
+## 0.1.2 (2012-08-24)
+
+* small UI improvement: 
+  prettify the JSON documents and display them in a
+  modal window proportionally adjusted by the current
+  browser' window size.
+
 ## 0.1.1 (2012-07-18)
 
 * using agnostic-will_paginate
