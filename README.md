@@ -50,7 +50,7 @@ In the mean time, I'd love for you to check out these screenshots to get a feel 
 ![Database info](https://img.skitch.com/20120716-g4cbs3yrrwifa5pscnafitw3hw.png)
 
 **documents query and management**
-![Documents view](https://img.skitch.com/20120716-nhjfsadxug7shnkfqmui5wc7qp.png)
+![Documents view](screens/example_doc_view.png)
 
 **index management**
 ![Indexes view](https://img.skitch.com/20120716-c7bwmw31wr3kmsb9ebsufhsrtj.png)
